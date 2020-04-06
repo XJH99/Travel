@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxust.dao.ProductMapper">
+<!--    <resultMap id="ProductResult" type="com.jxust.bean.Product">-->
+<!--        <id property="id" column="id" ></id>-->
+<!--        <result property="productName" column="p"></result>-->
+<!--    </resultMap>-->
+    <!--查询所有旅游产品-->
+    <select id="findAll" resultType="com.jxust.bean.Product">
+        select * from product;
+    </select>
+
+    <!--添加产品-->
+    <insert id="save" parameterType="com.jxust.bean.Product">
+        insert into
+        product(productName,cityName,departureTime,productPrice,productDesc,productStatus)
+        values(#{productName},#{cityName},#{departureTime},#{productPrice},#{productDesc},#{productStatus})
+    </insert>
+
+    <!--更新产品:使用动态sql的方式进行修改-->
+    <update id="update" parameterType="com.jxust.bean.Product">
+        update product
+        <set>
+            <if test="productName != null">productName = #{productName,jdbcType=VARCHAR},</if>
+            <if test="cityName != null">cityName = #{cityName,jdbcType=VARCHAR},</if>
+            <if test="departureTime != null">departureTime = #{departureTime,jdbcType=TIMESTAMP},</if>
+            <if test="productPrice != null">productPrice = #{productPrice,jdbcType=DOUBLE},</if>
+            <if test="productDesc != null">productDesc = #{productDesc,jdbcType=VARCHAR},</if>
+            <if test="productStatus != null">productStatus = #{productStatus,jdbcType=INTEGER},</if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--删除产品-->
+    <delete id="delete" parameterType="Integer">
+        delete from product where id = #{id,jdbcType=INTEGER}
+    </delete>
+    
+    <!--根据id查询产品-->
+    <select id="findById" parameterType="Integer" resultType="com.jxust.bean.Product">
+        select * from product where id = #{id,jdbcType=INTEGER};
+    </select>
+</mapper>

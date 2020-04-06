@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxust.dao.RoleMapper">
+
+    <resultMap id="RoleResultMap" type="com.jxust.bean.Role">
+        <id column="id" property="id" />
+        <result column="roleName" property="roleName" />
+        <result column="roleDesc" property="roleDesc" />
+        <collection
+                property="permissions" ofType="com.jxust.bean.Permission"
+                column="id" select="com.jxust.dao.PermissionMapper.findByRoleId"></collection>
+    </resultMap>
+    <!--通过用户的id查询对应的角色-->
+    <select id="findByUserId" parameterType="integer" resultMap="RoleResultMap">
+        select * from role
+        where id in (
+            select role_id
+            from user_role
+            where user_id = #{userId,jdbcType=INTEGER}
+            )
+    </select>
+
+    <!--查询所有的角色-->
+    <select id="findAll" resultMap="RoleResultMap">
+        select * from role
+    </select>
+
+    <!--添加角色-->
+    <insert id="save" parameterType="com.jxust.bean.Role">
+        insert into role(roleName, roleDesc)
+        values (#{roleName,jdbcType=VARCHAR},#{roleDesc,jdbcType=VARCHAR})
+    </insert>
+
+    <!--更新角色-->
+    <update id="update" parameterType="com.jxust.bean.Role">
+        update role
+        <set>
+            <if test="roleName != null">roleName = #{roleName,jdbcType=VARCHAR},</if>
+            <if test="roleDesc != null">roleDesc = #{roleDesc,jdbcType=VARCHAR},</if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--通过角色名查找角色-->
+    <select id="findByRoleName" parameterType="string" resultType="com.jxust.bean.Role">
+        select * from role where roleName = #{roleName,jdbcType=VARCHAR}
+    </select>
+
+    <!--通过id来删除-->
+    <delete id="deleteById" parameterType="integer">
+        delete from role where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--id查询角色-->
+    <select id="findById" parameterType="integer" resultMap="RoleResultMap">
+        select * from role where id = #{id,jdbcType=INTEGER}
+    </select>
+</mapper>

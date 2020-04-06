@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxust.dao.UserMapper">
+
+    <!--用户映射结果集-->
+    <resultMap id="UserResultMap" type="com.jxust.bean.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="gender" property="gender" />
+        <result column="email" property="email" />
+        <result column="phoneNum" property="phoneNum" />
+        <result column="face" property="face" />
+        <!--一对多，关联查询出角色的所有信息-->
+        <collection
+                property="roles" ofType="com.jxust.bean.Role"
+                column="id" select="com.jxust.dao.RoleMapper.findByUserId"></collection>
+    </resultMap>
+
+    <!--通过id查询用户-->
+    <select id="findById" parameterType="integer" resultMap="UserResultMap">
+        SELECT * FROM USER WHERE id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--查询所有用户-->
+    <select id="findAll" resultMap="UserResultMap">
+        select * from user
+    </select>
+
+    <!--添加用户-->
+    <insert id="save" parameterType="com.jxust.bean.User">
+        insert into user (username,password,gender,email,phoneNum)
+        values (#{username},#{password},#{gender},#{email},#{phoneNum});
+    </insert>
+
+    <!--更新用户-->
+    <update id="update" parameterType="com.jxust.bean.User">
+        update user
+        <set>
+            <if test="username != null">username = #{username,jdbcType=VARCHAR},</if>
+            <if test="password != null">password = #{password,jdbcType=VARCHAR},</if>
+            <if test="gender != null">gender = #{gender,jdbcType=VARCHAR},</if>
+            <if test="email != null">email = #{email,jdbcType=VARCHAR},</if>
+            <if test="phoneNum != null">phoneNum = #{phoneNum,jdbcType=VARCHAR},</if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--用户名查询用户-->
+    <select id="findByUsername" parameterType="string" resultType="com.jxust.bean.User">
+        select * from user where username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <!--通过id删除-->
+    <delete id="deleteById" parameterType="integer">
+        delete from user where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+
+</mapper>

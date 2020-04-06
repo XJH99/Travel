@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxust.dao.PermissionMapper">
+    <select id="findByRoleId" parameterType="integer" resultType="com.jxust.bean.Permission">
+        select * from permission
+        where id in (
+            select permission_id
+            from role_permission
+            where role_id = #{roleId,jdbcType=INTEGER}
+            )
+    </select>
+
+    <!--先查询出所有的父权限-->
+    <select id="findPermissionTree" resultMap="PermissionTreeResultMap">
+        select * from permission where parent_id is null 
+    </select>
+
+    <resultMap id="PermissionTreeResultMap" type="com.jxust.vm.PermissionTree">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="route" property="route" />
+        <result column="type" property="type" />
+        <result column="icon" property="icon" />
+        <result column="parent_id" property="parent_id" />
+        <collection
+                property="children" ofType="com.jxust.bean.Permission"
+                column="id" select="findByParentId"></collection>
+    </resultMap>
+
+    <!--父id查子权限-->
+    <select id="findByParentId" parameterType="integer" resultType="com.jxust.bean.Permission">
+        select * from permission where parent_id = #{id,jdbcType=INTEGER}
+    </select>
+</mapper>

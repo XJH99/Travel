@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxust.dao.OrderMapper">
+    <!--订单结果集-->
+    <resultMap id="OrdersResultMap" type="com.jxust.bean.Orders">
+        <id column="id" property="id" />
+        <result column="orderTime" property="orderTime" />
+        <result column="orderStatus" property="orderStatus" />
+        <result column="orderDesc" property="orderDesc" />
+        <result column="peopleCount" property="peopleCount" />
+        <result column="payType" property="payType" />
+        <!--关联查询，拿到产品id查出产品所有信息-->
+        <association
+                property="product" javaType="com.jxust.bean.Product"
+                column="productId"
+                select="com.jxust.dao.ProductMapper.findById"></association>
+        <!--关联查询，拿到会员id查出跟团会员所有信息-->
+        <association
+                property="member" javaType="com.jxust.bean.Member"
+                column="memberId"
+                select="com.jxust.dao.MemberMapper.findById"></association>
+        <!--一对多，关联查询出游客的所有信息-->
+        <collection
+                property="travellers" ofType="com.jxust.bean.Traveller"
+                column="id" select="com.jxust.dao.TravellerMapper.findByOrderId"></collection>
+    </resultMap>
+
+    <!--查询所有订单-->
+    <select id="findAll" resultMap="OrdersResultMap">
+        select * from orders
+    </select>
+
+    <!--根据id查询订单-->
+    <select id="findById" parameterType="integer" resultMap="OrdersResultMap">
+        select * from orders where id = #{id}
+    </select>
+</mapper>
